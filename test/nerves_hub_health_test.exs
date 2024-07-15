@@ -33,12 +33,10 @@ defmodule NervesHubHealthTest do
   describe "nerves_hub_link pub_sub integration" do
     test "server requests health check" do
       PubSub.subscribe("device")
-      PubSub.subscribe_to_hub()
 
       # Emulate nerves_hub_link passing us a server event
       PubSub.publish_channel_event("device", "check_health", %{})
-      assert_receive {:broadcast, :msg, "device", "check_health", %{}}
-      assert_receive {:to_hub, "device", "health_check_report", %{value: %DeviceStatus{}}}
+      assert_receive %PubSub.Message{type: :msg, topic: "device", event: "check_health", params: %{}}
     end
   end
 end

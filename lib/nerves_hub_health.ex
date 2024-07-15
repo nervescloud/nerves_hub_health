@@ -43,10 +43,10 @@ defmodule NervesHubHealth do
   end
 
   @impl GenServer
-  def handle_info({:broadcast, :msg, "device", "check_health", _params}, state) do
+  def handle_info(%PubSub.Message{type: :msg, topic: "device", event: "check_health"}, state) do
     case check_health() do
       %DeviceStatus{} = ds ->
-        PubSub.publish_to_hub("device", "health_check_report", %{value: ds})
+        NervesHubLink.Socket.send_message("device", "health_check_report", %{value: ds})
 
       {:error, reason} ->
         Logger.error("Failed to call health check: #{inspect(reason)}")
@@ -59,7 +59,8 @@ defmodule NervesHubHealth do
     {:noreply, state}
   end
 
-  def handle_info({:broadcast, _, _, _}, state) do
+  # Calmly ignore the ones we don't care to process
+  def handle_info(%PubSub.Message{}, state) do
     {:noreply, state}
   end
 end
