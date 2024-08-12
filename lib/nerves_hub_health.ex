@@ -21,6 +21,8 @@ defmodule NervesHubHealth do
     report = Application.get_env(:nerves_hub_health, :report, default_report)
 
     if report do
+      :alarm_handler.clear_alarm(NervesHubHealth.HealthCheckFailed)
+
       DeviceStatus.new(
         timestamp: report.timestamp(),
         metadata: report.metadata(),
@@ -30,7 +32,8 @@ defmodule NervesHubHealth do
       )
     end
   rescue
-    _ ->
+    err ->
+      Logger.error("Health check failed due to error: #{inspect(err)}")
       :alarm_handler.set_alarm({NervesHubHealth.HealthCheckFailed, []})
 
       DeviceStatus.new(
@@ -40,6 +43,19 @@ defmodule NervesHubHealth do
         metrics: %{},
         checks: %{}
       )
+  end
+
+  def report_health do
+    case check_health() do
+      %DeviceStatus{} = ds ->
+        NervesHubLink.Socket.send_message("device", "health_check_report", %{value: ds})
+
+      {:error, reason} ->
+        Logger.error("Failed to call health check: #{inspect(reason)}")
+
+      nil ->
+        Logger.error("Health check returned a nil value.")
+    end
   end
 
   @impl GenServer
@@ -54,7 +70,6 @@ defmodule NervesHubHealth do
       nil ->
         Logger.error("Health check returned a nil value.")
     end
-
 
     {:noreply, state}
   end
