@@ -1,4 +1,8 @@
 defmodule NervesHubHealth.DefaultReport do
+  @moduledoc """
+  A default health report implementation with support for easily adding
+  new metadata, metrics and such via config.
+  """
   @behaviour NervesHubHealth.Report
   alias NervesHubHealth.Report
   require Logger
