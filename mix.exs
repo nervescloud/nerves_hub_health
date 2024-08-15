@@ -23,6 +23,7 @@ defmodule NervesHubHealth.MixProject do
   defp deps do
     [
       {:jason, "~> 1.0"},
+      {:vintage_net, ">= 0.0.0", runtime: false},
       {:nerves_hub_link, path: "../nerves_hub_link"}
     ]
   end

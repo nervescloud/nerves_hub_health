@@ -8,7 +8,7 @@ config :nerves_hub_link,
   host: "0.0.0.0:4001",
   fwup_public_keys: ["a key"],
   shared_secret: [
-    identifier: "test", 
+    identifier: "test",
     product_key: "nhp_test",
     product_secret: "nhp_test"
   ],
