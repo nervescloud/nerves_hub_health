@@ -78,4 +78,9 @@ defmodule NervesHubHealth do
   def handle_info(%PubSub.Message{}, state) do
     {:noreply, state}
   end
+
+  # Ignore disconnects
+  def handle_info(%{type: :disconnect}, state) do
+    {:noreply, state}
+  end
 end
